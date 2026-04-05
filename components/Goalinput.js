@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
+  Text,
   StyleSheet,
 } from 'react-native';
 
@@ -19,6 +19,8 @@ function GoalInput(props) {
     setEnteredGoalText('');
   }
 
+  const isDisabled = enteredGoalText.trim().length === 0;
+
   return (
     <View style={styles.inputContainer}>
       <TextInput
@@ -28,16 +30,38 @@ function GoalInput(props) {
         onChangeText={goalInputHandler}
         value={enteredGoalText}
       />
-      <TouchableOpacity
-        style={[
-          styles.addButton,
-          enteredGoalText.trim().length === 0 && styles.addButtonDisabled,
-        ]}
+
+      <Pressable
         onPress={addGoalHandler}
-        activeOpacity={0.75}
+
+        onPressIn={() => console.log('Press started')}
+
+        onPressOut={() => console.log('Press released')}
+
+        onLongPress={() => console.log('Long press detected on Add button!')}
+
+        delayLongPress={600}
+
+        disabled={isDisabled}
+
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+
+        pressRetentionOffset={{ top: 20, bottom: 30, left: 20, right: 20 }}
+
+        android_ripple={{ color: '#4A6B55', borderless: false }}
+
+        style={({ pressed }) => [
+          styles.addButton,
+          isDisabled && styles.addButtonDisabled,
+          pressed && !isDisabled && styles.addButtonPressed,
+        ]}
       >
-        <Text style={styles.addButtonText}>+ Add</Text>
-      </TouchableOpacity>
+        {({ pressed }) => (
+          <Text style={styles.addButtonText}>
+            {pressed && !isDisabled ? 'Adding...' : '+ Add'}
+          </Text>
+        )}
+      </Pressable>
     </View>
   );
 }
@@ -75,6 +99,11 @@ const styles = StyleSheet.create({
   addButtonDisabled: {
     backgroundColor: SAGE_DIM,
     opacity: 0.5,
+  },
+  addButtonPressed: {
+    backgroundColor: '#5C8A6A',
+    opacity: 0.85,
+    transform: [{ scale: 0.97 }],
   },
   addButtonText: {
     color: '#fff',
